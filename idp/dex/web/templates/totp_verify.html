@@ -11,6 +11,33 @@
     <p class="nb-subheading">Enter the code from your authenticator app.</p>
     {{ end }}
 
+    {{ if .TotpKey }}
+    <details style="margin: 1em 0;">
+        <summary>Set up manually</summary>
+        <p class="nb-subheading">Enter this sensitive TOTP setup key into your authenticator application.</p>
+        <div style="display: flex; gap: 0.5em; align-items: center;">
+            <code id="totp-setup-key" style="overflow-wrap: anywhere;">{{ .TotpKey }}</code>
+            <button type="button" id="copy-totp-key" class="nb-btn nb-btn-compact">Copy</button>
+        </div>
+        <div id="copy-totp-status" role="status" aria-live="polite"></div>
+    </details>
+    <script>
+        (() => {
+            const button = document.getElementById("copy-totp-key");
+            const key = document.getElementById("totp-setup-key");
+            const status = document.getElementById("copy-totp-status");
+            button.addEventListener("click", async () => {
+                try {
+                    await navigator.clipboard.writeText(key.textContent);
+                    status.textContent = "Copied.";
+                } catch (_) {
+                    status.textContent = "Copy failed. Select and copy the setup key manually.";
+                }
+            });
+        })();
+    </script>
+    {{ end }}
+
     <form method="post" action="{{ .PostURL }}">
         {{ if .Invalid }}
         <div class="nb-error">
